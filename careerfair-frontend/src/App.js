@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 function App() {
 
   // State
-  const [currentAccount, setCurrentAccount] = useState('');
+  const [companyName, setCompanyName, currentAccount, setCurrentAccount] = useState('');
 
   // Ethereum info
   const ethereum = window.ethereum;
@@ -46,6 +46,23 @@ function App() {
     }
   }
 
+  const addCompany = async () => {
+    try {
+      if (!ethereum) {
+        console.log('No ETH wallet detected');
+        return;
+      }
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const tx = await contract.add(companyName);
+      await tx.wait();
+    } catch (e) {
+      alert('Only the owner can add a company');
+    }
+  }
+
   const unenroll = async () => {
     try {
       if (!ethereum) {
@@ -71,10 +88,10 @@ function App() {
         </button>
       )}
       <br />
-      <form>
-        <input placeholder='Coinbase'></input>
-        <button>Add Company</button>
-      </form>
+      <div>
+        <input value={companyName} onInput={e => setCompanyName(e.target.value)} placeholder='Coinbase'></input>
+        <button onClick={addCompany}>Add Company</button>
+      </div>
       <br />
       <button onClick={enroll}>Enroll</button>
       <button onClick={unenroll}>Unenroll</button>
