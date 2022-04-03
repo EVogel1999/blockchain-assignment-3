@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 function App() {
 
   // State
-  const [companyName, setCompanyName, currentAccount, setCurrentAccount] = useState('');
+  const [attendees, setAttendees, companyName, setCompanyName, currentAccount, setCurrentAccount] = useState('');
 
   // Ethereum info
   const ethereum = window.ethereum;
@@ -63,6 +63,23 @@ function App() {
     }
   }
 
+  const getAttendees = async () => {
+    try {
+      if (!ethereum) {
+        console.log('No ETH wallet detected');
+        return;
+      }
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const attendees = await contract.getAttendees();
+      setAttendees(attendees.filter(student => student !== '0x0000000000000000000000000000000000000000'));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   const unenroll = async () => {
     try {
       if (!ethereum) {
@@ -80,6 +97,12 @@ function App() {
     }
   }
 
+  const list = (
+    <ul>
+      {(attendees || []).map(student => <li key={student}>{student}</li>)}
+    </ul>
+  );
+
   return (
     <div className="App">
       {!currentAccount && (
@@ -96,7 +119,11 @@ function App() {
       <button onClick={enroll}>Enroll</button>
       <button onClick={unenroll}>Unenroll</button>
       <br />
-      <button>See Attendees</button>
+      <button onClick={getAttendees}>See Attendees</button>
+      <hr />
+      <h1>Career Fair Attendees</h1>
+      {(attendees && attendees.length > 0) && list}
+      {!(attendees && attendees.length > 0) && <p>No one is enrolled</p>}
     </div>
   );
 }
