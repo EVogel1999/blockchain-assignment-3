@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat run .\\scripts\\test.js"
+    "test": "npx hardhat run .\\scripts\\test.js",
+    "deploy:rinkeby": "npx hardhat run .\\scripts\\deploy.js --network rinkeby"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "hardhat": "^2.9.2"
   },
   "devDependencies": {
